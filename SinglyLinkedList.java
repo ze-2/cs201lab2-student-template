@@ -1,4 +1,6 @@
 
+import java.util.*;
+
 public class SinglyLinkedList<E extends Comparable<E>> {
 
     private Node<E> head = null;
@@ -102,60 +104,34 @@ public class SinglyLinkedList<E extends Comparable<E>> {
 
     // write your codes here
     public void swap() {
-        E lastMin = null;
-        E lastMax = null;
-
-        for (int k = 0; k < size / 2; k++) {
-            Node<E> min = null, minPrev = null;
-            Node<E> max = null, maxPrev = null;
-            Node<E> prev = null;
-            Node<E> current = head;
-            while (current != null) {
-                E e = current.getElement();
-                if ((lastMin == null || e.compareTo(lastMin) > 0) && (min == null || e.compareTo(min.getElement()) < 0)) {
-                    min = current;
-                    minPrev = prev;
-                }
-                if ((lastMax == null || e.compareTo(lastMax) < 0) && (max == null || e.compareTo(max.getElement()) > 0)) {
-                    max = current;
-                    maxPrev = prev;
-                }
-                prev = current;
-                current = current.getNext();
-            }
-
-            lastMin = min.getElement();
-            lastMax = max.getElement();
-            swapNodes(minPrev, min, maxPrev, max);
-        }
-    }
-
-    private void swapNodes(Node<E> aPrev, Node<E> a, Node<E> bPrev, Node<E> b) {
-        if (a == b) {
+        if (size < 2) {
             return;
         }
 
-        if (aPrev == null) {
-            head = b;
-        } else {
-            aPrev.setNext(b);
-        }
-        if (bPrev == null) {
-            head = a;
-        } else {
-            bPrev.setNext(a);
+        ArrayList<Node<E>> nodes = new ArrayList<>(size);
+        Node<E> current = head;
+        while (current != null) {
+            nodes.add(current);
+            current = current.getNext();
         }
 
-        Node<E> temp = a.getNext();
-        a.setNext(b.getNext());
-        b.setNext(temp);
+        Integer[] rank = new Integer[size];
+        for (int i = 0; i < size; i++) {
+            rank[i] = i;
+        }
+        Arrays.sort(rank, (a, b) -> nodes.get(a).getElement().compareTo(nodes.get(b).getElement()));
 
-        if (a.getNext() == null) {
-            tail = a;
+        ArrayList<Node<E>> swapped = new ArrayList<>(nodes);
+        for (int k = 0; k < size; k++) {
+            swapped.set(rank[k], nodes.get(rank[size - 1 - k]));
         }
-        if (b.getNext() == null) {
-            tail = b;
+
+        head = swapped.get(0);
+        for (int i = 0; i < size - 1; i++) {
+            swapped.get(i).setNext(swapped.get(i + 1));
         }
+        tail = swapped.get(size - 1);
+        tail.setNext(null);
     }
 
 }
